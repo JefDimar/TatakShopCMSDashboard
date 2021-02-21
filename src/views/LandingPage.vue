@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <b-card class="container bg-light justify-content-center align-center w-25">
+  <div class="container-fluid">
+    <b-card class="container bg-light d-flex justify-content-center align-item-center w-25 mt-5">
       <h1>Welcome to CMS for E-Commerce</h1>
       <b-form @submit.prevent="onSubmit" @reset.prevent="onReset">
         <b-form-group
@@ -14,7 +14,6 @@
             v-model="form.email"
             type="email"
             placeholder="Email address"
-            required
           ></b-form-input>
         </b-form-group>
 
@@ -22,8 +21,8 @@
           <b-form-input
             id="input-2"
             v-model="form.password"
+            type="password"
             placeholder="Password"
-            required
           ></b-form-input>
         </b-form-group>
 
@@ -46,9 +45,18 @@ export default {
     }
   },
   methods: {
-    onSubmit (event) {
+    onSubmit () {
+      const input = {
+        email: this.form.email,
+        password: this.form.password
+      }
+      this.$store.dispatch('login', input)
+      this.form.email = ''
+      this.form.password = ''
     },
-    onReset (event) {
+    onReset () {
+      this.form.email = ''
+      this.form.password = ''
     }
   }
 }
