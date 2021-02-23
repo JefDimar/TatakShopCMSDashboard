@@ -1,21 +1,22 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from '../api/axios'
+import router from '../router'
 import Swal from 'sweetalert2'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    access_token: '',
-    error: ''
+    isLoggedIn: false,
+    products: []
   },
   mutations: {
-    SET_ACCESS_TOKEN (state, token) {
-      state.access_token = token
+    SET_ISLOGGEDIN (state, data) {
+      state.isLoggedIn = data
     },
-    SET_ERROR (state, err) {
-      state.error = err
+    FETCH_PRODUCTS (state, data) {
+      state.products = data
     }
   },
   actions: {
@@ -24,25 +25,39 @@ export default new Vuex.Store({
         email: input.email,
         password: input.password
       })
-        .then(token => {
-          console.log(token)
-          context.commit('SET_ACCESS_TOKEN', token.access_token)
-          localStorage.access_token = token.access_token
+        .then(({ data }) => {
+          localStorage.access_token = data.access_token
           Swal.fire({
-            text: token.message,
+            text: data.message,
             icon: 'success',
-            showConfirmButton: false
+            showConfirmButton: false,
+            timer: 2000
           })
-          this.$router.push('/mainPage')
+          router.push('/mainPage')
+          context.commit('SET_ISLOGGEDIN', true)
         })
         .catch(({ response }) => {
-          context.commit('SET_ERROR', response.data.message)
           Swal.fire({
             title: 'Unauthorized!',
             text: response.data.message,
             icon: 'error',
-            showConfirmButton: false
+            showConfirmButton: false,
+            timer: 2000
           })
+        })
+    },
+    logout (context) {
+      context.commit('SET_ISLOGGEDIN', false)
+    },
+    fetchProducts (context) {
+      axios.get('/products', {
+        headers: { access_token: localStorage.access_token }
+      })
+        .then(({ data }) => {
+          context.commit('FETCH_PRODUCTS', data)
+        })
+        .catch(({ response }) => {
+          console.log(response.data)
         })
     }
   },
