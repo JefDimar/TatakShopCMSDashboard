@@ -9,7 +9,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     isLoggedIn: false,
-    products: []
+    products: [],
+    product: {}
   },
   mutations: {
     SET_ISLOGGEDIN (state, data) {
@@ -17,6 +18,15 @@ export default new Vuex.Store({
     },
     FETCH_PRODUCTS (state, data) {
       state.products = data
+    },
+    ADD_PRODUCT (state, data) {
+      state.products.push(data)
+    },
+    POPULATE_FORM (state, data) {
+      state.product = data
+    },
+    DELETE_PRODUCT (state, id) {
+      state.products = state.products.filter(product => product.id !== id)
     }
   },
   actions: {
@@ -59,6 +69,95 @@ export default new Vuex.Store({
         .catch(({ response }) => {
           console.log(response.data)
         })
+    },
+    addProduct (context, data) {
+      axios({
+        url: '/products',
+        method: 'POST',
+        data: {
+          name: data.name,
+          image_url: data.image_url,
+          price: data.price,
+          stock: data.stock
+        },
+        headers: {
+          access_token: localStorage.access_token
+        }
+      })
+        .then(({ data }) => {
+          context.commit('ADD_PRODUCT', data)
+        })
+        .catch(({ response }) => {
+          Swal.fire({
+            title: 'Unauthorized!',
+            text: response.data.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        })
+    },
+    populateForm (context, id) {
+      axios({
+        url: `/products/${id}`,
+        method: 'GET',
+        headers: {
+          access_token: localStorage.access_token
+        }
+      })
+        .then(({ data }) => {
+          // console.log(data)
+          context.commit('POPULATE_FORM', data)
+        })
+        .catch(({ response }) => {
+          Swal.fire({
+            title: 'Unauthorized!',
+            text: response.data.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        })
+    },
+    deleteProduct (context, id) {
+      Swal.fire({
+        title: 'Do you really want to delete this product?',
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonText: 'Confirm',
+        denyButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios({
+            url: `/products/${id}`,
+            method: 'DELETE',
+            headers: {
+              access_token: localStorage.access_token
+            }
+          })
+            .then(({ data }) => {
+              Swal.fire({
+                title: 'Success',
+                icon: 'success',
+                text: data.message,
+                showConfirmButton: false,
+                timer: 2000
+              })
+              context.commit('DELETE_PRODUCT', id)
+            })
+            .catch(({ response }) => {
+              Swal.fire({
+                title: 'Unauthorized!',
+                text: response.data.message,
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+              })
+            })
+        } else if (result.isDenied) {
+          Swal.fire('Product not deleted', '', 'info')
+        }
+      })
     }
   },
   modules: {
