@@ -1,10 +1,9 @@
 <template>
   <div>
-    <div>
-      <b-jumbotron header="Dashboard CMS" bg-variant="secondary"></b-jumbotron>
-    </div>
+    <jumbotron/>
     <div class="container-fluid bg-light">
       <b-button variant="primary" class="mt-3 mb-3" v-b-modal.modal-2>Add Products</b-button>
+      <!-- Tabel -->
       <b-table
         striped
         hover
@@ -13,7 +12,7 @@
         :fields="fields">
         <!-- render image with v-slot from bootstrap-vue -->
         <template #cell(image_url)="data">
-          <img :src="data.value" style="width: 150px; height: 100px;">
+          <img :src="data.value" :alt="data.item.name" style="width: 150px; height: 100px;">
         </template>
         <template #cell(price)="data">
           <p>{{ data.value.toLocaleString('en-US', { style: 'currency', currency: 'IDR' }) }}</p>
@@ -36,7 +35,7 @@
           </b-button-group>
         </template>
       </b-table>
-      <!-- Modal buat edit kak gabisa dipisah ke component masih belom docs di bootstrap vue -->
+      <!-- Modal buat edit kak gabisa dipisah ke component masih belom paham docs di bootstrap vue -->
       <b-modal id="modal-1" title="Edit Form:">
         <b-form-group>
           <label>Name:</label>
@@ -68,8 +67,13 @@
 </template>
 
 <script>
+import Jumbotron from '../components/Jumbotron'
+
 export default {
   name: 'MainPage',
+  components: {
+    Jumbotron
+  },
   data () {
     return {
       fields: [
@@ -114,7 +118,14 @@ export default {
       this.stock = 0
     },
     populateForm (id) {
-      this.$store.dispatch('populateForm', id)
+      if (!this.populate.id) {
+        this.$store.dispatch('populateForm', id)
+      } else {
+        this.name = this.populate.name
+        this.image_url = this.populate.image_url
+        this.price = this.populate.price
+        this.stock = this.populate.stock
+      }
     },
     deleteProduct (id) {
       this.$store.dispatch('deleteProduct', id)
@@ -127,16 +138,8 @@ export default {
     products () {
       return this.$store.state.products
     },
-    populate: {
-      get: function () {
-        return this.$store.state.product
-      },
-      set: function (newValue) {
-        this.name = newValue.name
-        this.image_url = newValue.image_url
-        this.price = newValue.price
-        this.stock = newValue.stock
-      }
+    populate () {
+      return this.$store.state.product
     }
   }
 }

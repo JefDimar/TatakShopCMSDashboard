@@ -52,7 +52,7 @@ export default new Vuex.Store({
             text: response.data.message,
             icon: 'error',
             showConfirmButton: false,
-            timer: 2000
+            timer: 5000
           })
         })
     },
@@ -93,7 +93,7 @@ export default new Vuex.Store({
             text: response.data.message,
             icon: 'error',
             showConfirmButton: false,
-            timer: 2000
+            timer: 5000
           })
         })
     },
@@ -115,7 +115,7 @@ export default new Vuex.Store({
             text: response.data.message,
             icon: 'error',
             showConfirmButton: false,
-            timer: 2000
+            timer: 5000
           })
         })
     },
@@ -151,7 +151,7 @@ export default new Vuex.Store({
                 text: response.data.message,
                 icon: 'error',
                 showConfirmButton: false,
-                timer: 2000
+                timer: 5000
               })
             })
         } else if (result.isDenied) {
