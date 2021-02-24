@@ -25,8 +25,11 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = localStorage.access_token
-  if (to.name !== 'LandingPage' && !auth) {
+  console.log(auth)
+  if (to.name === 'MainPage' && !auth) {
     next({ name: 'LandingPage' })
+  } else if (to.name === 'LandingPage' && auth) {
+    next(({ name: 'MainPage' }))
   } else {
     next()
   }

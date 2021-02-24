@@ -45,6 +45,11 @@ export default {
     statusLogged () {
       return this.$store.state.isLoggedIn
     }
+  },
+  created () {
+    if (localStorage.access_token) {
+      this.$store.commit('SET_ISLOGGEDIN', true)
+    }
   }
 }
 </script>

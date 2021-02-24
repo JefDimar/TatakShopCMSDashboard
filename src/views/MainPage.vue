@@ -119,6 +119,10 @@ export default {
     },
     populateForm (id) {
       if (!this.populate.id) {
+        this.name = ''
+        this.image_url = ''
+        this.price = 0
+        this.stock = 0
         this.$store.dispatch('populateForm', id)
       } else {
         this.name = this.populate.name
