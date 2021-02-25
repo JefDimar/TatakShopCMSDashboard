@@ -158,6 +158,40 @@ export default new Vuex.Store({
           Swal.fire('Product not deleted', '', 'info')
         }
       })
+    },
+    editProduct (context, data) {
+      axios({
+        url: `/products/${data.id}`,
+        method: 'PUT',
+        headers: {
+          access_token: localStorage.access_token
+        },
+        data: {
+          name: data.name,
+          image_url: data.image_url,
+          price: data.price,
+          stock: data.stock
+        }
+      })
+        .then(({ data }) => {
+          Swal.fire({
+            title: 'Success',
+            text: data.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 4000
+          })
+          context.dispatch('fetchProducts')
+        })
+        .catch(({ response }) => {
+          Swal.fire({
+            title: 'Unauthorized!',
+            text: response.data.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 5000
+          })
+        })
     }
   },
   modules: {

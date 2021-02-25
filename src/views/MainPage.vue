@@ -16,15 +16,15 @@
         </template>
         <template #cell(price)="data">
           <p>{{ data.value.toLocaleString('en-US', { style: 'currency', currency: 'IDR' }) }}</p>
-          <b-input-group prepend="Edit" size="sm">
-            <b-form-input></b-form-input>
+          <b-input-group prepend="IDR" size="sm">
+            <b-form-input type="number"></b-form-input>
             <b-button size="sm">Submit</b-button>
           </b-input-group>
         </template>
         <template #cell(stock)="data">
           <p>{{ data.value }}</p>
-          <b-input-group prepend="Edit" size="sm">
-            <b-form-input></b-form-input>
+          <b-input-group prepend="QTY" size="sm">
+            <b-form-input type="number"></b-form-input>
             <b-button size="sm">Submit</b-button>
           </b-input-group>
         </template>
@@ -36,7 +36,7 @@
         </template>
       </b-table>
       <!-- Modal buat edit kak gabisa dipisah ke component masih belom paham docs di bootstrap vue -->
-      <b-modal id="modal-1" title="Edit Form:">
+      <b-modal id="modal-1" title="Edit Form:" @ok.prevent="editProduct(populate.id)" @cancel.prevent="reset">
         <b-form-group>
           <label>Name:</label>
           <b-form-input v-model="name"></b-form-input>
@@ -49,7 +49,7 @@
         </b-form-group>
       </b-modal>
 
-      <b-modal id="modal-2" title="Add Form:" @ok.prevent="addProduct">
+      <b-modal id="modal-2" title="Add Form:" @ok.prevent="addProduct" @cancel.prevent="reset">
         <b-form-group>
           <label>Name:</label>
           <b-form-input v-model="name"></b-form-input>
@@ -93,6 +93,7 @@ export default {
         },
         'actions'
       ],
+      id: 0,
       name: '',
       image_url: '',
       price: 0,
@@ -118,21 +119,43 @@ export default {
       this.stock = 0
     },
     populateForm (id) {
-      if (!this.populate.id) {
-        this.name = ''
-        this.image_url = ''
-        this.price = 0
-        this.stock = 0
-        this.$store.dispatch('populateForm', id)
-      } else {
-        this.name = this.populate.name
-        this.image_url = this.populate.image_url
-        this.price = this.populate.price
-        this.stock = this.populate.stock
-      }
+      this.$store.dispatch('populateForm', id)
+      this.id = id
+      this.name = this.populate.name
+      this.image_url = this.populate.image_url
+      this.price = this.populate.price
+      this.stock = this.populate.stock
     },
     deleteProduct (id) {
       this.$store.dispatch('deleteProduct', id)
+    },
+    editProduct (id) {
+      const data = {
+        id,
+        name: this.name,
+        image_url: this.image_url,
+        price: this.price,
+        stock: this.stock
+      }
+      this.$store.dispatch('editProduct', data)
+      this.id = 0
+      this.name = ''
+      this.image_url = ''
+      this.price = 0
+      this.stock = 0
+      this.$nextTick(() => {
+        this.$bvModal.hide('modal-1')
+      })
+    },
+    reset () {
+      this.id = 0
+      this.name = ''
+      this.image_url = ''
+      this.price = 0
+      this.stock = 0
+      this.$nextTick(() => {
+        this.$bvModal.hide('modal-1')
+      })
     }
   },
   created () {
