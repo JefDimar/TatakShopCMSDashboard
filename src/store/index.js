@@ -192,6 +192,38 @@ export default new Vuex.Store({
             timer: 5000
           })
         })
+    },
+    editStockPrice (context, data) {
+      axios({
+        url: `/products/${data.id}`,
+        method: 'PATCH',
+        headers: {
+          access_token: localStorage.access_token
+        },
+        data: {
+          stock: data.stock,
+          price: data.price
+        }
+      })
+        .then(({ data }) => {
+          Swal.fire({
+            title: 'Success',
+            text: data.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 4000
+          })
+          context.dispatch('fetchProducts')
+        })
+        .catch(({ response }) => {
+          Swal.fire({
+            title: 'Unauthorized!',
+            text: response.data.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 5000
+          })
+        })
     }
   },
   modules: {
